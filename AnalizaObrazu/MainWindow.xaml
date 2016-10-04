@@ -5,8 +5,73 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnalizaObrazu"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="825">
+    
     <Grid>
         
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TabControl  Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TabItem  Header="Black and White" IsSelected="True">
+                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <MenuItem Name="ImageLoad0" Header="Load Image" Click="LoadImage"/>
+                    <MenuItem Name="SaveAs0" Header="Save As" Click="SaveImageAs"/>
+                    <MenuItem Name="BlackWhite" Header="Black and white" Click="BlackWhite_Click"/>
+                </Menu>
+            </TabItem>
+            <TabItem  Header="Odwrocenie" IsSelected="False">
+                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <MenuItem Name="ImageLoad1" Header="Load Image" Click="LoadImage"/>
+                    <MenuItem Name="SaveAs1" Header="Save As" Click="SaveImageAs"/>
+                    <MenuItem Name="Odwrocenie" Header="Odwrócenie" Click="Odwrocenie_Click"/>
+                </Menu>
+            </TabItem>
+            <TabItem  Header="Jasność" IsSelected="False">
+                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <MenuItem Name="ImageLoad2" Header="Load Image" Click="LoadImage"/>
+                    <MenuItem Name="SaveAs2" Header="Save As" Click="SaveImageAs"/>
+                    <TextBlock Text="Rozjaśnij o:"/>
+                    <TextBox Name="LightCoeficient" Text="8" Width="25"></TextBox>
+                    <MenuItem Name="Lightning" Header="Jasność" Click="Lightning_Click"/>
+                </Menu>
+            </TabItem>
+            <TabItem  Header="Kontrast" IsSelected="False">
+                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <MenuItem Name="ImageLoad3" Header="Load Image" Click="LoadImage"/>
+                    <MenuItem Name="SaveAs3" Header="Save As" Click="SaveImageAs"/>
+                    <TextBlock Text="Stała kontrastu:"/>
+                    <TextBox Name="ContrastCoeficient" Text="8" Width="25"></TextBox>
+                    <MenuItem Name="ContrastMultiply" Header="Mnożenie" Click="ContrastMultiply_Click"/>
+                    <MenuItem Name="ContrastPower" Header="Potęga" Click="ContrastPower_Click"/>
+                    <MenuItem Name="ContrastLogarithm" Header="Logarytm" Click="ContrastLogarithm_Click"/>
+                </Menu>
+            </TabItem>
+            <TabItem  Header="Progowanie" IsSelected="False">
+                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <MenuItem Name="ImageLoad4" Header="Load Image" Click="LoadImage"/>
+                    <MenuItem Name="SaveAs4" Header="Save As" Click="SaveImageAs"/>
+                    <MenuItem Name="ProgowanieSlider" Header="Progowanie" Click="ProgowanieSlider_Click"/>
+                    <Slider x:Name="slider" Width="256"/>
+                    <MenuItem Name="MetodaOdsu" Header="Metoda Odsu" Click="MetodaOdsu_Click"/>
+                    <MenuItem Name="MetodaBarensa" Header="Metoda Barensa" Click="MetodaBarensa_Click"/>
+                </Menu>
+            </TabItem>
+        </TabControl>
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Name="ImageEditor" Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Image Name="board"/>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <Image Name="board2"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
