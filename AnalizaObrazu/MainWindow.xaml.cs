@@ -32,6 +32,8 @@ namespace AnalizaObrazu
         int myExt;
         int originalColors;
         int pmax = 0;
+        int[] hist_h;
+        int[] hist_v;
         List<Vector3D> cSpace;
 
         public MainWindow()
@@ -81,6 +83,8 @@ namespace AnalizaObrazu
         {
             Matrix = new int[img.Width, img.Height, 4];
             MatrixZero = new int[img.Width, img.Height, 4];
+            hist_h = new int[img.Width];
+            hist_v = new int[img.Height];
             cSpace = new List<Vector3D>();
             cSpace.Clear();
             for (int i = 0; i < img.Width; i++)
@@ -402,19 +406,39 @@ namespace AnalizaObrazu
                         for (int j = 0; j < img.Height; j++)
                         {
                             //picture data
-                            if ((MatrixZero[i, j, 0] < (int)slider.Value) || (MatrixZero[i, j, 1] < (int)slider.Value) || (MatrixZero[i, j, 2] < (int)slider.Value))
-                            {
-                                Matrix[i, j, 0] = 0;
-                                Matrix[i, j, 1] = 0;
-                                Matrix[i, j, 2] = 0;
+                            int mean = (MatrixZero[i, j, 0] + MatrixZero[i, j, 1] + MatrixZero[i, j, 2]) / 3;
+
+                            if (meanInput.IsChecked == true)
+                                {
+                                if (mean < (int)slider.Value)
+                                {
+                                    Matrix[i, j, 0] = 0;
+                                    Matrix[i, j, 1] = 0;
+                                    Matrix[i, j, 2] = 0;
+                                }
+                                else
+                                {
+                                    Matrix[i, j, 0] = 255;
+                                    Matrix[i, j, 1] = 255;
+                                    Matrix[i, j, 2] = 255;
+                                }
                             }
                             else
                             {
-                                Matrix[i, j, 0] = 255;
-                                Matrix[i, j, 1] = 255;
-                                Matrix[i, j, 2] = 255;
+                                if ((MatrixZero[i, j, 0] < (int)slider.Value) || (MatrixZero[i, j, 1] < (int)slider.Value) || (MatrixZero[i, j, 2] < (int)slider.Value))
+                                {
+                                    Matrix[i, j, 0] = 0;
+                                    Matrix[i, j, 1] = 0;
+                                    Matrix[i, j, 2] = 0;
+                                }
+                                else
+                                {
+                                    Matrix[i, j, 0] = 255;
+                                    Matrix[i, j, 1] = 255;
+                                    Matrix[i, j, 2] = 255;
+                                }
                             }
-
+                            
                             System.Drawing.Color c = System.Drawing.Color.FromArgb(Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2]);
                             img.SetPixel(i, j, c);
                         }
@@ -435,6 +459,52 @@ namespace AnalizaObrazu
 
         private void MetodaBarensa_Click(object sender, RoutedEventArgs e)
         {
+
+        }
+
+        private void SaveHistogram_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void GenerateHistogram_Click(object sender, RoutedEventArgs e)
+        {
+
+            for (int j = 0; j < img.Height; j++)
+            {
+                hist_v[j] = 0;
+            }
+            for (int i = 0; i < img.Width; i++)
+            {
+                hist_h[i] = 0;
+            }
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+                    //picture data
+                    int mean = (MatrixZero[i, j, 0] + MatrixZero[i, j, 1] + MatrixZero[i, j, 2]) / 3;
+
+                    if (mean < 128)
+                    {
+                        Matrix[i, j, 0] = 0;
+                        Matrix[i, j, 1] = 0;
+                        Matrix[i, j, 2] = 0;
+                        hist_h[i]++;
+                        hist_v[j]++;
+                    }
+                    else
+                    {
+                        Matrix[i, j, 0] = 255;
+                        Matrix[i, j, 1] = 255;
+                        Matrix[i, j, 2] = 255;
+                    }
+
+                    System.Drawing.Color c = System.Drawing.Color.FromArgb(Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2]);
+                    img.SetPixel(i, j, c);
+                }
+            }
+            this.board2.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(img.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(img.Width, img.Height));
 
         }
     }

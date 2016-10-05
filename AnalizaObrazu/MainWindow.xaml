@@ -53,9 +53,18 @@
                     <MenuItem Name="ImageLoad4" Header="Load Image" Click="LoadImage"/>
                     <MenuItem Name="SaveAs4" Header="Save As" Click="SaveImageAs"/>
                     <MenuItem Name="ProgowanieSlider" Header="Progowanie" Click="ProgowanieSlider_Click"/>
-                    <Slider x:Name="slider" Width="256"/>
+                    <Slider x:Name="slider" Width="256" Minimum="0" Maximum="255"/>
+                    <CheckBox Name="meanInput" IsChecked="True"/>
                     <MenuItem Name="MetodaOdsu" Header="Metoda Odsu" Click="MetodaOdsu_Click"/>
                     <MenuItem Name="MetodaBarensa" Header="Metoda Barensa" Click="MetodaBarensa_Click"/>
+                </Menu>
+            </TabItem>
+            <TabItem  Header="Black and White" IsSelected="False">
+                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <MenuItem Name="ImageLoad5" Header="Load Image" Click="LoadImage"/>
+                    <MenuItem Name="GenerateHistogram" Header="Generate Histogram" Click="GenerateHistogram_Click"/>
+                    <TextBox Name="HistogramName" Text="hist" Width="100"></TextBox>
+                    <MenuItem Name="SaveHistogram" Header="Save Histogram" Click="SaveHistogram_Click"/>
                 </Menu>
             </TabItem>
         </TabControl>
