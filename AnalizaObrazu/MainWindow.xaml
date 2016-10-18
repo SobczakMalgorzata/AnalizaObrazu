@@ -5,70 +5,102 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnalizaObrazu"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="825">
+        Title="MainWindow" Height="350" Width="925" MinHeight="350" MinWidth="925">
     
     <Grid>
         
         <Grid.RowDefinitions>
-            <RowDefinition Height="48"/>
+            <RowDefinition Height="74"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TabControl  Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <TabItem  Header="Black and White" IsSelected="True">
-                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <MenuItem Name="ImageLoad0" Header="Load Image" Click="LoadImage"/>
-                    <MenuItem Name="SaveAs0" Header="Save As" Click="SaveImageAs"/>
-                    <MenuItem Name="BlackWhite" Header="Black and white" Click="BlackWhite_Click"/>
-                </Menu>
+            <TabItem  Header="Part 1" IsSelected="False">
+            <TabControl  Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TabItem  Header="Black and White" IsSelected="True">
+                    <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <MenuItem Name="ImageLoad0" Header="Load Image" Click="LoadImage"/>
+                        <MenuItem Name="SaveAs0" Header="Save As" Click="SaveImageAs"/>
+                        <MenuItem Name="BlackWhite" Header="Black and white" Click="BlackWhite_Click"/>
+                    </Menu>
+                </TabItem>
+                <TabItem  Header="Odwrocenie" IsSelected="False">
+                    <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <MenuItem Name="ImageLoad1" Header="Load Image" Click="LoadImage"/>
+                        <MenuItem Name="SaveAs1" Header="Save As" Click="SaveImageAs"/>
+                        <MenuItem Name="Odwrocenie" Header="Odwrócenie" Click="Odwrocenie_Click"/>
+                    </Menu>
+                </TabItem>
+                <TabItem  Header="Jasność" IsSelected="False">
+                    <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <MenuItem Name="ImageLoad2" Header="Load Image" Click="LoadImage"/>
+                        <MenuItem Name="SaveAs2" Header="Save As" Click="SaveImageAs"/>
+                        <TextBlock Text="Rozjaśnij o:"/>
+                        <TextBox Name="LightCoeficient" Text="8" Width="25"></TextBox>
+                        <MenuItem Name="Lightning" Header="Jasność" Click="Lightning_Click"/>
+                    </Menu>
+                </TabItem>
+                <TabItem  Header="Kontrast" IsSelected="False">
+                    <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <MenuItem Name="ImageLoad3" Header="Load Image" Click="LoadImage"/>
+                        <MenuItem Name="SaveAs3" Header="Save As" Click="SaveImageAs"/>
+                        <TextBlock Text="Stała kontrastu:"/>
+                        <TextBox Name="ContrastCoeficient" Text="8" Width="25"></TextBox>
+                        <MenuItem Name="ContrastMultiply" Header="Mnożenie" Click="ContrastMultiply_Click"/>
+                        <MenuItem Name="ContrastPower" Header="Potęga" Click="ContrastPower_Click"/>
+                        <MenuItem Name="ContrastLogarithm" Header="Logarytm" Click="ContrastLogarithm_Click"/>
+                    </Menu>
+                </TabItem>
+                <TabItem  Header="Progowanie" IsSelected="False">
+                    <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <MenuItem Name="ImageLoad4" Header="Load Image" Click="LoadImage"/>
+                        <MenuItem Name="SaveAs4" Header="Save As" Click="SaveImageAs"/>
+                        <MenuItem Name="ProgowanieSlider" Header="Progowanie" Click="ProgowanieSlider_Click"/>
+                        <Slider x:Name="slider" Width="256" Minimum="0" Maximum="255"/>
+                        <CheckBox Name="meanInput" IsChecked="True"/>
+                        <MenuItem Name="MetodaOdsu" Header="Metoda Odsu" Click="MetodaOdsu_Click"/>
+                        <MenuItem Name="MetodaBarensa" Header="Metoda Barensa" Click="MetodaBarensa_Click"/>
+                    </Menu>
+                </TabItem>
+                    <TabItem  Header="Black and White" IsSelected="False">
+                        <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <MenuItem Name="ImageLoad5" Header="Load Image" Click="LoadImage"/>
+                            <MenuItem Name="GenerateHistogram" Header="Generate Histogram" Click="GenerateHistogram_Click"/>
+                            <TextBox Name="HistogramName" Text="hist" Width="100"></TextBox>
+                            <MenuItem Name="SaveHistogram" Header="Save Histogram" Click="SaveHistogram_Click"/>
+                        </Menu>
+                    </TabItem>
+                </TabControl>
             </TabItem>
-            <TabItem  Header="Odwrocenie" IsSelected="False">
-                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <MenuItem Name="ImageLoad1" Header="Load Image" Click="LoadImage"/>
-                    <MenuItem Name="SaveAs1" Header="Save As" Click="SaveImageAs"/>
-                    <MenuItem Name="Odwrocenie" Header="Odwrócenie" Click="Odwrocenie_Click"/>
-                </Menu>
-            </TabItem>
-            <TabItem  Header="Jasność" IsSelected="False">
-                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <MenuItem Name="ImageLoad2" Header="Load Image" Click="LoadImage"/>
-                    <MenuItem Name="SaveAs2" Header="Save As" Click="SaveImageAs"/>
-                    <TextBlock Text="Rozjaśnij o:"/>
-                    <TextBox Name="LightCoeficient" Text="8" Width="25"></TextBox>
-                    <MenuItem Name="Lightning" Header="Jasność" Click="Lightning_Click"/>
-                </Menu>
-            </TabItem>
-            <TabItem  Header="Kontrast" IsSelected="False">
-                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <MenuItem Name="ImageLoad3" Header="Load Image" Click="LoadImage"/>
-                    <MenuItem Name="SaveAs3" Header="Save As" Click="SaveImageAs"/>
-                    <TextBlock Text="Stała kontrastu:"/>
-                    <TextBox Name="ContrastCoeficient" Text="8" Width="25"></TextBox>
-                    <MenuItem Name="ContrastMultiply" Header="Mnożenie" Click="ContrastMultiply_Click"/>
-                    <MenuItem Name="ContrastPower" Header="Potęga" Click="ContrastPower_Click"/>
-                    <MenuItem Name="ContrastLogarithm" Header="Logarytm" Click="ContrastLogarithm_Click"/>
-                </Menu>
-            </TabItem>
-            <TabItem  Header="Progowanie" IsSelected="False">
-                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <MenuItem Name="ImageLoad4" Header="Load Image" Click="LoadImage"/>
-                    <MenuItem Name="SaveAs4" Header="Save As" Click="SaveImageAs"/>
-                    <MenuItem Name="ProgowanieSlider" Header="Progowanie" Click="ProgowanieSlider_Click"/>
-                    <Slider x:Name="slider" Width="256" Minimum="0" Maximum="255"/>
-                    <CheckBox Name="meanInput" IsChecked="True"/>
-                    <MenuItem Name="MetodaOdsu" Header="Metoda Odsu" Click="MetodaOdsu_Click"/>
-                    <MenuItem Name="MetodaBarensa" Header="Metoda Barensa" Click="MetodaBarensa_Click"/>
-                </Menu>
-            </TabItem>
-            <TabItem  Header="Black and White" IsSelected="False">
-                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <MenuItem Name="ImageLoad5" Header="Load Image" Click="LoadImage"/>
-                    <MenuItem Name="GenerateHistogram" Header="Generate Histogram" Click="GenerateHistogram_Click"/>
-                    <TextBox Name="HistogramName" Text="hist" Width="100"></TextBox>
-                    <MenuItem Name="SaveHistogram" Header="Save Histogram" Click="SaveHistogram_Click"/>
-                </Menu>
+            <TabItem  Header="Part 2" IsSelected="True">
+                <TabControl  Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <TabItem  Header="Filtry" IsSelected="False">
+                        <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <MenuItem Name="ImageLoad0p2" Header="Load Image" Click="LoadImage"/>
+                            <MenuItem Name="SaveAs0p2" Header="Save As" Click="SaveImageAs"/>
+                            <MenuItem Name="MeanFilter" Header="Uśrednienie" Click="MeanFilter_Click"/>
+                            <MenuItem Name="GaussFilter" Header="Filtr Gaussa" Click="GaussFilter_Click"/>
+                            <MenuItem Name="SharpenFilter" Header="Wyosrtrzenie" Click="SharpenFilter_Click"/>
+                            <MenuItem Name="RobertsCross" Header="Krzyż Robertsa" Click="RobertsCross_Click"/>
+                        </Menu>
+                    </TabItem>
+                    <TabItem  Header="Sobel" IsSelected="True">
+                        <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <MenuItem Name="ImageLoad1p2" Header="Load Image" Click="LoadImage"/>
+                            <MenuItem Name="SaveAs1p2" Header="Save As" Click="SaveImageAs"/>
+                            <MenuItem Name="SobelOperator0" Header="Filtr Sobela 0" Click="SobelOperator0_Click"/>
+                            <MenuItem Name="SobelOperator45" Header="Filtr Sobela 45" Click="SobelOperator45_Click"/>
+                            <MenuItem Name="SobelOperator90" Header="Filtr Sobela 90" Click="SobelOperator90_Click"/>
+                            <MenuItem Name="SobelOperator135" Header="Filtr Sobela 135" Click="SobelOperator135_Click"/>
+                            <MenuItem Name="SobelOperator180" Header="Filtr Sobela 180" Click="SobelOperator180_Click"/>
+                            <MenuItem Name="SobelOperator225" Header="Filtr Sobela 225" Click="SobelOperator225_Click"/>
+                            <MenuItem Name="SobelOperator270" Header="Filtr Sobela 270" Click="SobelOperator270_Click"/>
+                            <MenuItem Name="SobelOperator315" Header="Filtr Sobela 315" Click="SobelOperator315_Click"/>
+                        </Menu>
+                    </TabItem>
+                </TabControl>
             </TabItem>
         </TabControl>
-        
+
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

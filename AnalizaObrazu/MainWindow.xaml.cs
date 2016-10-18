@@ -35,10 +35,52 @@ namespace AnalizaObrazu
         int[] hist_h;
         int[] hist_v;
         List<Vector3D> cSpace;
+        int[,] MBlur = new int[3, 3];
+        int dBlur = 9;
+        int[,] MGaussianSmoothing = new int[3, 3];
+        int dGaussianSmoothing = 8;
+        int[,] MSharpenFilter = new int[3, 3];
+        int[,] MEdgeDetectionLeft = new int[3, 3];
+        int[,] MEdgeDetectionRight = new int[3, 3];
+
 
         public MainWindow()
         {
             InitializeComponent();
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MBlur[i, j] = 1;
+                    MGaussianSmoothing[i, j] = 1;
+                    MSharpenFilter[i, j] = -1;
+                    MEdgeDetectionLeft[i, j] = 0;
+                    MEdgeDetectionRight[i, j] = 0;
+                    //MEmboss[i, j] = 1;
+                }
+            }
+            MGaussianSmoothing[1, 0] = 2;
+            MGaussianSmoothing[0, 1] = 2;
+            MGaussianSmoothing[2, 1] = 2;
+            MGaussianSmoothing[1, 2] = 2;
+            MGaussianSmoothing[1, 1] = 4;
+
+            MSharpenFilter[1, 0] = -2;
+            MSharpenFilter[0, 1] = -2;
+            MSharpenFilter[2, 1] = -2;
+            MSharpenFilter[1, 2] = -2;
+            MSharpenFilter[1, 1] = 13;
+
+            //MSharpenFilter[0, 0] = 0;
+            //MSharpenFilter[0, 2] = 0;
+            //MSharpenFilter[2, 0] = 0;
+            //MSharpenFilter[2, 2] = 0;
+            //MSharpenFilter[1, 1] = 5;
+
+            MEdgeDetectionLeft[0, 0] = 1;
+            MEdgeDetectionLeft[1, 1] = -1;
+            MEdgeDetectionLeft[0, 1] = 1;
+            MEdgeDetectionLeft[1, 0] = -1;
         }
         private void LoadImage(object sender, RoutedEventArgs e)
         {
@@ -507,5 +549,455 @@ namespace AnalizaObrazu
             this.board2.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(img.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(img.Width, img.Height));
 
         }
+    public void Convolution(int[,] f, int d, int offset)
+    {
+        for (int i = 0; i < img.Width; i++)
+        {
+            for (int j = 0; j < img.Height; j++)
+            {
+                int a1 = 0;
+                int a2 = 0;
+                int a3 = 0;
+                int a0 = 0;
+                for (int k = -1; k <= 1; k++)
+                {
+                    for (int l = -1; l <= 1; l++)
+                    {
+
+                        if (i == 0 && k == -1 && j == 0 && l == -1)
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 2]);
+                        }
+                        else if (i == 0 && k == -1 && j == img.Height - 1 && l == 1)
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 2]);
+                        }
+                        else if (i == img.Width - 1 && k == 1 && j == 0 && l == -1)
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 2]);
+                        }
+                        else if (i == img.Width - 1 && k == 1 && j == img.Height - 1 && l == 1)
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 2]);
+                        }
+                        else if (i == 0 && k == -1)
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 2]);
+                        }
+                        else if (j == 0 && l == -1)
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 2]);
+                        }
+                        else if (i == img.Width - 1 && k == 1)
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 2]);
+                        }
+                        else if (j == img.Height - 1 && l == 1)
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 2]);
+                        }
+                        else
+                        {
+                            a0 += (f[k + 1, l + 1] * MatrixZero[i + k, j + l, 3]);
+                            a1 += (f[k + 1, l + 1] * MatrixZero[i + k, j + l, 0]);
+                            a2 += (f[k + 1, l + 1] * MatrixZero[i + k, j + l, 1]);
+                            a3 += (f[k + 1, l + 1] * MatrixZero[i + k, j + l, 2]);
+                        }
+                    }
+                }
+                Matrix[i, j, 0] = ((a1 / d) + offset);
+                Matrix[i, j, 1] = ((a2 / d) + offset);
+                Matrix[i, j, 2] = ((a3 / d) + offset);
+                Matrix[i, j, 3] = ((a0 / d) + offset);
+            }
+        }
     }
+        public void ConvolutionRobertsCross(int[,] f1, int[,] f, int d, int offset)
+        {
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+                    int a1 = 0;
+                    int a2 = 0;
+                    int a3 = 0;
+                    int a0 = 0;
+                    for (int k = -1; k <= 1; k++)
+                    {
+                        for (int l = -1; l <= 1; l++)
+                        {
+
+                            if (i == 0 && k == -1 && j == 0 && l == -1)
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 2]);
+                            }
+                            else if (i == 0 && k == -1 && j == img.Height - 1 && l == 1)
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 2]);
+                            }
+                            else if (i == img.Width - 1 && k == 1 && j == 0 && l == -1)
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 2]);
+                            }
+                            else if (i == img.Width - 1 && k == 1 && j == img.Height - 1 && l == 1)
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 2]);
+                            }
+                            else if (i == 0 && k == -1)
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 2]);
+                            }
+                            else if (j == 0 && l == -1)
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 2]);
+                            }
+                            else if (i == img.Width - 1 && k == 1)
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 2]);
+                            }
+                            else if (j == img.Height - 1 && l == 1)
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 2]);
+                            }
+                            else
+                            {
+                                a0 += (f1[k + 1, l + 1] * MatrixZero[i + k, j + l, 3]);
+                                a1 += (f1[k + 1, l + 1] * MatrixZero[i + k, j + l, 0]);
+                                a2 += (f1[k + 1, l + 1] * MatrixZero[i + k, j + l, 1]);
+                                a3 += (f1[k + 1, l + 1] * MatrixZero[i + k, j + l, 2]);
+                            }
+                            if (i == 0 && k == -1 && j == 0 && l == -1)
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + 1 + l, 2]);
+                            }
+                            else if (i == 0 && k == -1 && j == img.Height - 1 && l == 1)
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j - 1 + l, 2]);
+                            }
+                            else if (i == img.Width - 1 && k == 1 && j == 0 && l == -1)
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + 1 + l, 2]);
+                            }
+                            else if (i == img.Width - 1 && k == 1 && j == img.Height - 1 && l == 1)
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j - 1 + l, 2]);
+                            }
+                            else if (i == 0 && k == -1)
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i + 1 + k, j + l, 2]);
+                            }
+                            else if (j == 0 && l == -1)
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i + k, j + 1 + l, 2]);
+                            }
+                            else if (i == img.Width - 1 && k == 1)
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i - 1 + k, j + l, 2]);
+                            }
+                            else if (j == img.Height - 1 && l == 1)
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i + k, j - 1 + l, 2]);
+                            }
+                            else
+                            {
+                                a0 += (f[k + 1, l + 1] * MatrixZero[i + k, j + l, 3]);
+                                a1 += (f[k + 1, l + 1] * MatrixZero[i + k, j + l, 0]);
+                                a2 += (f[k + 1, l + 1] * MatrixZero[i + k, j + l, 1]);
+                                a3 += (f[k + 1, l + 1] * MatrixZero[i + k, j + l, 2]);
+                            }
+                        }
+                    }
+                    Matrix[i, j, 0] = ((a1 / d) + offset)/2;
+                    Matrix[i, j, 1] = ((a2 / d) + offset)/2;
+                    Matrix[i, j, 2] = ((a3 / d) + offset)/2;
+                    Matrix[i, j, 3] = ((a0 / d) + offset)/2;
+                }
+            }
+        }
+        public void ComeBack()
+        {
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+                    if (Matrix[i, j, 3] < 0)
+                        Matrix[i, j, 3] = 0;
+                    if (Matrix[i, j, 2] < 0)
+                        Matrix[i, j, 2] = 0;
+                    if (Matrix[i, j, 1] < 0)
+                        Matrix[i, j, 1] = 0;
+                    if (Matrix[i, j, 0] < 0)
+                        Matrix[i, j, 0] = 0;
+                    if (Matrix[i, j, 3] > 255)
+                        Matrix[i, j, 3] = 255;
+                    if (Matrix[i, j, 2] > 255)
+                        Matrix[i, j, 2] = 255;
+                    if (Matrix[i, j, 1] > 255)
+                        Matrix[i, j, 1] = 255;
+                    if (Matrix[i, j, 0] > 255)
+                        Matrix[i, j, 0] = 255;
+                    System.Drawing.Color c = System.Drawing.Color.FromArgb(Matrix[i, j, 3], Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2]);
+                    img.SetPixel(i, j, c);
+                }
+            }
+            this.board2.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(img.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(img.Width, img.Height));
+        }
+
+        private void MeanFilter_Click(object sender, RoutedEventArgs e)
+        {
+            Convolution(MBlur, dBlur, 0);
+            ComeBack();
+        }
+
+        private void GaussFilter_Click(object sender, RoutedEventArgs e)
+        {
+            Convolution(MGaussianSmoothing, dGaussianSmoothing, 0);
+            ComeBack();
+        }
+
+        private void SharpenFilter_Click(object sender, RoutedEventArgs e)
+        {
+            Convolution(MSharpenFilter, 1, 0);
+            ComeBack();
+        }
+
+        private void RobertsCross_Click(object sender, RoutedEventArgs e)
+        {
+            ConvolutionRobertsCross(MEdgeDetectionLeft, MEdgeDetectionRight, 1, 100);
+            ComeBack();
+        }
+
+        private void SobelOperator0_Click(object sender, RoutedEventArgs e)
+        {
+            int[,] MSobel = new int[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MSobel[i, j] = 0;
+                }
+            }
+            MSobel[0, 0] = -1;
+            MSobel[0, 1] = -2;
+            MSobel[0, 2] = -1;
+            MSobel[2, 0] = 1;
+            MSobel[2, 1] = 2;
+            MSobel[2, 2] = 1;
+            Convolution(MSobel, 1, 0);
+            ComeBack();
+        }
+
+        private void SobelOperator45_Click(object sender, RoutedEventArgs e)
+        {
+            int[,] MSobel = new int[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MSobel[i, j] = 0;
+                }
+            }
+            MSobel[1, 2] = -1;
+            MSobel[0, 1] = -1;
+            MSobel[0, 2] = -2;
+            MSobel[2, 0] = 2;
+            MSobel[2, 1] = 1;
+            MSobel[1, 0] = 1;
+            Convolution(MSobel, 1, 0);
+            ComeBack();
+        }
+
+        private void SobelOperator90_Click(object sender, RoutedEventArgs e)
+        {
+            int[,] MSobel = new int[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MSobel[i, j] = 0;
+                }
+            }
+            MSobel[0, 0] = 1;
+            MSobel[1, 0] = 2;
+            MSobel[2, 0] = 1;
+            MSobel[0, 2] = -1;
+            MSobel[1, 2] = -2;
+            MSobel[2, 2] = -1;
+            Convolution(MSobel, 1, 0);
+            ComeBack();
+        }
+
+        private void SobelOperator135_Click(object sender, RoutedEventArgs e)
+        {
+            int[,] MSobel = new int[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MSobel[i, j] = 0;
+                }
+            }
+            MSobel[0, 0] = 2;
+            MSobel[1, 0] = 1;
+            MSobel[0, 1] = 1;
+            MSobel[2, 1] = -1;
+            MSobel[1, 2] = -1;
+            MSobel[2, 2] = -2;
+            Convolution(MSobel, 1, 0);
+            ComeBack();
+        }
+
+        private void SobelOperator180_Click(object sender, RoutedEventArgs e)
+        {
+            int[,] MSobel = new int[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MSobel[i, j] = 0;
+                }
+            }
+            MSobel[0, 0] = 1;
+            MSobel[0, 1] = 2;
+            MSobel[0, 2] = 1;
+            MSobel[2, 0] = -1;
+            MSobel[2, 1] = -2;
+            MSobel[2, 2] = -1;
+            Convolution(MSobel, 1, 0);
+            ComeBack();
+        }
+
+        private void SobelOperator225_Click(object sender, RoutedEventArgs e)
+        {
+            int[,] MSobel = new int[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MSobel[i, j] = 0;
+                }
+            }
+            MSobel[1, 2] = 1;
+            MSobel[0, 1] = 1;
+            MSobel[0, 2] = 2;
+            MSobel[2, 0] = -2;
+            MSobel[2, 1] = -1;
+            MSobel[1, 0] = -1;
+            Convolution(MSobel, 1, 0);
+            ComeBack();
+        }
+
+        private void SobelOperator270_Click(object sender, RoutedEventArgs e)
+        {
+            int[,] MSobel = new int[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MSobel[i, j] = 0;
+                }
+            }
+            MSobel[0, 0] = -1;
+            MSobel[1, 0] = -2;
+            MSobel[2, 0] = -1;
+            MSobel[0, 2] = 1;
+            MSobel[1, 2] = 2;
+            MSobel[2, 2] = 1;
+            Convolution(MSobel, 1, 0);
+            ComeBack();
+        }
+
+        private void SobelOperator315_Click(object sender, RoutedEventArgs e)
+        {
+            int[,] MSobel = new int[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    MSobel[i, j] = 0;
+                }
+            }
+            MSobel[0, 0] = -2;
+            MSobel[1, 0] = -1;
+            MSobel[0, 1] = -1;
+            MSobel[2, 1] = 1;
+            MSobel[1, 2] = 1;
+            MSobel[2, 2] = 2;
+            Convolution(MSobel, 1, 0);
+            ComeBack();
+        }
+    }
+    
 }
