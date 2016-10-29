@@ -34,6 +34,8 @@ namespace AnalizaObrazu
         int pmax = 0;
         int[] hist_h;
         int[] hist_v;
+        int[] hist_c;
+        int[] hist_c_mod;
         List<Vector3D> cSpace;
         int[,] MBlur = new int[3, 3];
         int dBlur = 9;
@@ -111,6 +113,7 @@ namespace AnalizaObrazu
                             myExt = op.FilterIndex;
                             //getting data from picture
                             getRGB();
+                            getColorHistogram();
                         }
                     }
                 }
@@ -121,6 +124,38 @@ namespace AnalizaObrazu
                 myStream.Dispose();
             }
         }
+
+        public void getColorHistogram()
+        {
+            hist_c = new int[256];
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+                    for (int c = 0; c < 256; c++)
+                    {
+                        int mean = (MatrixZero[i, j, 0] + MatrixZero[i, j, 1] + MatrixZero[i, j, 2]) / 3;
+
+                        if (mean == c)
+                        {
+                            hist_c[c]++;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void histTrnaslation()
+        {
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+                    //Mod for hist change
+                }
+            }
+        }
+
         public void getRGB()
         {
             Matrix = new int[img.Width, img.Height, 4];
