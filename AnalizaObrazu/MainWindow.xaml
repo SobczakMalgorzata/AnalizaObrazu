@@ -58,10 +58,9 @@
                         <Slider x:Name="slider" Width="256" Minimum="0" Maximum="255"/>
                         <CheckBox Name="meanInput" IsChecked="True"/>
                         <MenuItem Name="MetodaOdsu" Header="Metoda Odsu" Click="MetodaOdsu_Click"/>
-                        <MenuItem Name="MetodaBarensa" Header="Metoda Barensa" Click="MetodaBarensa_Click"/>
                     </Menu>
                 </TabItem>
-                    <TabItem  Header="Black and White" IsSelected="False">
+                    <TabItem  Header="Projekcja" IsSelected="False">
                         <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <MenuItem Name="ImageLoad5" Header="Load Image" Click="LoadImage"/>
                             <MenuItem Name="GenerateHistogram" Header="Generate Histogram" Click="GenerateHistogram_Click"/>
@@ -73,6 +72,15 @@
             </TabItem>
             <TabItem  Header="Part 2" IsSelected="True">
                 <TabControl  Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <TabItem  Header="Histogram" IsSelected="False">
+                        <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <MenuItem Name="ImageLoad3p2" Header="Load Image" Click="LoadImage"/>
+                            <MenuItem Name="SaveAs3p2" Header="Save As" Click="SaveImageAs"/>
+                            <MenuItem Name="Equalization" Header="Wyrównanie" Click="Equalization_Click"/>
+                            <MenuItem Name="Normalization" Header="Rozciaganie" Click="Normalization_Click"/>
+                            
+                        </Menu>
+                    </TabItem>
                     <TabItem  Header="Filtry" IsSelected="False">
                         <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <MenuItem Name="ImageLoad0p2" Header="Load Image" Click="LoadImage"/>
@@ -80,6 +88,7 @@
                             <MenuItem Name="MeanFilter" Header="Uśrednienie" Click="MeanFilter_Click"/>
                             <MenuItem Name="GaussFilter" Header="Filtr Gaussa" Click="GaussFilter_Click"/>
                             <MenuItem Name="SharpenFilter" Header="Wyosrtrzenie" Click="SharpenFilter_Click"/>
+                            <MenuItem Name="Laplasjan" Header="Laplasjan" Click="Laplasjan_Click"/>
                             <MenuItem Name="RobertsCross" Header="Krzyż Robertsa" Click="RobertsCross_Click"/>
                         </Menu>
                     </TabItem>
