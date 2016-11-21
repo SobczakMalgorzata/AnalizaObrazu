@@ -34,6 +34,8 @@ namespace AnalizaObrazu
         int originalColors;
         int pmax = 0;
         int pmin = 255;
+        int pgmax = 0;
+        int pgmin = 255;
         int[] hist_h;
         int[] hist_v;
         int[] hist_c;
@@ -182,6 +184,9 @@ namespace AnalizaObrazu
             Matrix = new int[img.Width, img.Height, 4];
             MatrixZero = new int[img.Width, img.Height, 4];
             pmax = 0;
+            pgmax = 0;
+            pmin = 255;
+            pgmin = 255;
             hist_h = new int[img.Width];
             hist_v = new int[img.Height];
             cSpace = new List<Vector3D>();
@@ -209,7 +214,12 @@ namespace AnalizaObrazu
                             pmin = mean;
                         if (pmax < mean)
                             pmax = mean;
-                        
+
+                        if (pixel.G > 0 && pgmin > pixel.G)
+                            pgmin = pixel.G;
+                        if (pgmax < pixel.G)
+                            pgmax = pixel.G;
+
                         Vector3D asd = new Vector3D(Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2]);
                         if (colorSpace[Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2], 0] == 0)
                         {
@@ -635,7 +645,6 @@ namespace AnalizaObrazu
 
         }
         
-
         private void SaveHistogram_Click(object sender, RoutedEventArgs e)
         {
             string name = HistogramName.Text;
@@ -716,7 +725,8 @@ namespace AnalizaObrazu
             this.board2.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(img.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(img.Width, img.Height));
 
         }
-    public void Convolution(int[,] f, int d, int offset)
+
+        public void Convolution(int[,] f, int d, int offset)
     {
         for (int i = 0; i < img.Width; i++)
         {
@@ -803,6 +813,7 @@ namespace AnalizaObrazu
             }
         }
     }
+
         public void ConvolutionRobertsCross(int[,] f1, int[,] f, int d, int offset)
         {
             for (int i = 0; i < img.Width; i++)
@@ -953,6 +964,7 @@ namespace AnalizaObrazu
                 }
             }
         }
+
         public void ComeBack()
         {
             for (int i = 0; i < img.Width; i++)
@@ -1214,6 +1226,69 @@ namespace AnalizaObrazu
                     img.SetPixel(i, j, c);
                 }
             }
+            this.board2.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(img.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(img.Width, img.Height));
+
+        }
+
+        private void IrisDetection_Click(object sender, RoutedEventArgs e)
+        {
+            int[] LUT = new int[256];
+            int[,,] MatrixT;
+            MatrixT = new int[img.Width, img.Height, 3];
+
+
+
+            for (int i = 0; i < 256; i++)
+            {
+                double d = (double)(((double)255 / ((double)pgmax - (double)pgmin)) * ((double)i - (double)pgmin));
+                if (255 < (int)d)
+                    LUT[i] = 255;
+                else if (0 > (int)d)
+                    LUT[i] = 0;
+                else
+                    LUT[i] = (int)d;
+            }
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+
+                    //picture data
+                    int mean = Matrix[i, j, 1];
+                    Matrix[i, j, 0] = LUT[mean];
+                    Matrix[i, j, 1] = LUT[mean];
+                    Matrix[i, j, 2] = LUT[mean];
+
+                    mean = Matrix[i, j, 0];
+
+                    int upper = 150;
+                    int lower = 50;
+                    if (mean < upper)
+                    {
+                        Matrix[i, j, 0] = 0;
+                    }
+                    else
+                    {
+                        Matrix[i, j, 0] = 255;
+                    }
+                    if (mean < lower)
+                    {
+                        MatrixT[i, j, 0] = 255;
+                    }
+                    else
+                    {
+                        MatrixT[i, j, 0] = 0;
+                    }
+
+                    Matrix[i, j, 0] = Matrix[i, j, 0] + MatrixT[i, j, 0];
+                    Matrix[i, j, 1] = Matrix[i, j, 0];
+                    Matrix[i, j, 2] = Matrix[i, j, 0];
+
+                    System.Drawing.Color c = System.Drawing.Color.FromArgb(Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2]);
+                    img.SetPixel(i, j, c);
+                }
+            }
+            
             this.board2.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(img.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(img.Width, img.Height));
 
         }

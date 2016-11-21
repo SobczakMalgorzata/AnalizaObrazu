@@ -70,7 +70,7 @@
                     </TabItem>
                 </TabControl>
             </TabItem>
-            <TabItem  Header="Part 2" IsSelected="True">
+            <TabItem  Header="Part 2" IsSelected="False">
                 <TabControl  Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <TabItem  Header="Histogram" IsSelected="False">
                         <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -92,7 +92,7 @@
                             <MenuItem Name="RobertsCross" Header="Krzyż Robertsa" Click="RobertsCross_Click"/>
                         </Menu>
                     </TabItem>
-                    <TabItem  Header="Sobel" IsSelected="True">
+                    <TabItem  Header="Sobel" IsSelected="False">
                         <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <MenuItem Name="ImageLoad1p2" Header="Load Image" Click="LoadImage"/>
                             <MenuItem Name="SaveAs1p2" Header="Save As" Click="SaveImageAs"/>
@@ -107,6 +107,13 @@
                         </Menu>
                     </TabItem>
                 </TabControl>
+            </TabItem>
+            <TabItem  Header="Part 3" IsSelected="True">
+                <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <MenuItem Name="ImageLoadp3" Header="Load Image" Click="LoadImage"/>
+                    <MenuItem Name="SaveAsp3" Header="Save As" Click="SaveImageAs"/>
+                    <MenuItem Name="IrisDetection" Header="Detekcja tęczówki" Click="IrisDetection_Click"/>
+                </Menu>
             </TabItem>
         </TabControl>
 
