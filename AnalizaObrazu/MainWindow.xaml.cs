@@ -215,10 +215,10 @@ namespace AnalizaObrazu
                         if (pmax < mean)
                             pmax = mean;
 
-                        if (pixel.G > 0 && pgmin > pixel.G)
-                            pgmin = pixel.G;
-                        if (pgmax < pixel.G)
-                            pgmax = pixel.G;
+                        if (pixel.R > 0 && pgmin > pixel.R)
+                            pgmin = pixel.R;
+                        if (pgmax < pixel.R)
+                            pgmax = pixel.R;
 
                         Vector3D asd = new Vector3D(Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2]);
                         if (colorSpace[Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2], 0] == 0)
@@ -1235,7 +1235,21 @@ namespace AnalizaObrazu
             int[] LUT = new int[256];
             int[,,] MatrixT;
             MatrixT = new int[img.Width, img.Height, 3];
+            int[] hist_iris_v = new int[img.Height];
+            int[] hist_iris_h = new int[img.Width];
+            int[] hist_pupil_v = new int[img.Height];
+            int[] hist_pupil_h = new int[img.Width];
 
+            for (int j = 0; j < img.Height; j++)
+            {
+                hist_iris_v[j] = 0;
+                hist_pupil_v[j] = 0;
+            }
+            for (int i = 0; i < img.Width; i++)
+            {
+                hist_iris_h[i] = 0;
+                hist_pupil_h[i] = 0;
+            }
 
 
             for (int i = 0; i < 256; i++)
@@ -1254,41 +1268,148 @@ namespace AnalizaObrazu
                 {
 
                     //picture data
-                    int mean = Matrix[i, j, 1];
-                    Matrix[i, j, 0] = LUT[mean];
-                    Matrix[i, j, 1] = LUT[mean];
-                    Matrix[i, j, 2] = LUT[mean];
+                    //int mean = Matrix[i, j, 1];
+                    //Matrix[i, j, 0] = LUT[mean];
+                    //Matrix[i, j, 1] = LUT[mean];
+                    //Matrix[i, j, 2] = LUT[mean];
 
-                    mean = Matrix[i, j, 0];
+                    //mean = Matrix[i, j, 0];
+                    int mean = LUT[Matrix[i, j, 0]];
 
-                    int upper = 150;
-                    int lower = 50;
+                    int upper = 160;
+                    int lower = 20;
                     if (mean < upper)
                     {
-                        Matrix[i, j, 0] = 0;
+                        //Matrix[i, j, 0] = 0;
+                        hist_iris_h[i]++;
+                        hist_iris_v[j]++;
+                    }
+                    //else
+                    //{
+                    //    Matrix[i, j, 0] = 255;
+                    //}
+                    if (mean < lower)
+                    {
+                        //MatrixT[i, j, 0] = 0;
+                        hist_pupil_h[i]++;
+                        hist_pupil_v[j]++;
+                    }
+                    //else
+                    //{
+                    //    MatrixT[i, j, 0] = 255;
+                    //}
+
+
+                    //Matrix[i, j, 0] = MatrixT[i, j, 0];// + MatrixT[i, j, 0];
+                    //Matrix[i, j, 1] = Matrix[i, j, 0];
+                    //Matrix[i, j, 2] = Matrix[i, j, 0];
+                }
+            }
+            int noice_v = 20;
+            int noice_h = 30;
+            int iris_mean_v = 0;
+            int iris_mean_h = 0;
+            int pupil_mean_v = 0;
+            int pupil_mean_h = 0;
+            int iris_start_v = 0;
+            int iris_start_h = 0;
+            int pupil_start_v = 0;
+            int pupil_start_h = 0;
+            int iris_end_v = img.Height;
+            int iris_end_h = img.Width;
+            int pupil_end_v = img.Height;
+            int pupil_end_h = img.Width;
+
+            for (int j = 0; j < img.Height; j++)
+            {
+                iris_mean_v += hist_iris_v[j];
+                pupil_mean_v += hist_pupil_v[j];
+            }
+            for (int i = 0; i < img.Width; i++)
+            {
+                iris_mean_h += hist_iris_h[i];
+                pupil_mean_h += hist_pupil_h[i];
+            }
+            iris_mean_v = iris_mean_v/ img.Height;
+            iris_mean_h = iris_mean_h/ img.Width;
+            pupil_mean_v = pupil_mean_v/ img.Height;
+            pupil_mean_h = pupil_mean_h/ img.Width;
+
+            iris_mean_v = noice_v;
+            iris_mean_h = noice_h;
+            pupil_mean_v = noice_v;
+            pupil_mean_h = noice_h;
+
+            for (int j = 1; j < (img.Height -1); j++)
+            {
+                if (iris_mean_v < hist_iris_v[j])
+                {
+                    if (iris_mean_v >= hist_iris_v[j - 1])
+                        iris_start_v = j;
+                    if (iris_mean_v >= hist_iris_v[j + 1])
+                        iris_end_v = j;
+                }
+                if (pupil_mean_v < hist_pupil_v[j])
+                {
+                    if (pupil_mean_v >= hist_pupil_v[j - 1])
+                        pupil_start_v = j;
+                    if (pupil_mean_v >= hist_pupil_v[j + 1])
+                        pupil_end_v = j;
+                }
+            }
+            for (int i = 1; i < (img.Width-1); i++)
+            {
+                
+                if (iris_mean_h < hist_iris_h[i])
+                {
+                    if (iris_mean_h > hist_iris_h[i - 1])
+                        iris_start_h = i;
+                    if (iris_mean_h > hist_iris_h[i + 1])
+                        iris_end_h = i;
+                }
+                
+                if (pupil_mean_h < hist_pupil_h[i])
+                {
+                    if (pupil_mean_h > hist_pupil_h[i - 1])
+                        pupil_start_h = i;
+                    if (pupil_mean_h > hist_pupil_h[i + 1])
+                        pupil_end_h = i;
+                }
+            }
+            int pupil_v = pupil_end_v - pupil_start_v;
+            int pupil_h = pupil_end_h - pupil_start_h;
+            int iris_v = iris_end_v - iris_start_v;
+            int iris_h = iris_end_h - iris_start_h;
+            int pupil_r = (pupil_h) / 2;
+            int iris_r = (iris_h) / 2;
+            pupil_v = pupil_end_v - (pupil_r);
+            pupil_h = pupil_end_h - (pupil_r);
+
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+                    double distance_i = Math.Sqrt(Math.Pow(pupil_h - i, 2) + Math.Pow(pupil_v - j, 2));
+                    double distance_p = Math.Sqrt(Math.Pow(pupil_h - i, 2) + Math.Pow(pupil_v - j, 2));
+
+                    if (distance_i < iris_r && distance_p > pupil_r)
+                    {
+                        Matrix[i, j, 0] = MatrixZero[i, j, 0];
+                        Matrix[i, j, 1] = MatrixZero[i, j, 1];
+                        Matrix[i, j, 2] = MatrixZero[i, j, 2];
                     }
                     else
                     {
                         Matrix[i, j, 0] = 255;
+                        Matrix[i, j, 1] = 0;
+                        Matrix[i, j, 2] = 255;
                     }
-                    if (mean < lower)
-                    {
-                        MatrixT[i, j, 0] = 255;
-                    }
-                    else
-                    {
-                        MatrixT[i, j, 0] = 0;
-                    }
-
-                    Matrix[i, j, 0] = Matrix[i, j, 0] + MatrixT[i, j, 0];
-                    Matrix[i, j, 1] = Matrix[i, j, 0];
-                    Matrix[i, j, 2] = Matrix[i, j, 0];
 
                     System.Drawing.Color c = System.Drawing.Color.FromArgb(Matrix[i, j, 0], Matrix[i, j, 1], Matrix[i, j, 2]);
                     img.SetPixel(i, j, c);
                 }
             }
-            
+
             this.board2.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(img.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(img.Width, img.Height));
 
         }
