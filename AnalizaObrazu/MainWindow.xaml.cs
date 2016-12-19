@@ -90,6 +90,7 @@ namespace AnalizaObrazu
             MEdgeDetectionLeft[0, 1] = 1;
             MEdgeDetectionLeft[1, 0] = -1;
         }
+
         private void LoadImage(object sender, RoutedEventArgs e)
         {
 
@@ -232,6 +233,7 @@ namespace AnalizaObrazu
             }
             originalColors = cSpace.Count;
         }
+
         private void SaveImageAs(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -1419,6 +1421,7 @@ namespace AnalizaObrazu
             Matrix =  KMMAlgorithm(MatrixZero);
             ComeBack();
         }
+
         int[,,] KMMAlgorithm(int[,,] Mat)
         {
             int[,] MatN = new int[Mat.GetLength(0), Mat.GetLength(1)];
@@ -1441,9 +1444,11 @@ namespace AnalizaObrazu
                 }
             }
 
-            while (MatP != MatN)
+            while (!eq(MatP, MatN)) //MatP != MatN)
             {
-                MatP = MatN;
+                MatP = (int[,])MatN.Clone();
+                //MatP = MatN;
+
                 for (int i = 1; i < (MatN.GetLength(0) - 1); i++)
                 {
                     for (int j = 1; j < (MatN.GetLength(1) - 1); j++)
@@ -1470,29 +1475,92 @@ namespace AnalizaObrazu
                     {
                         if (MatN[i, j] == 2)
                         {
-                            int n = 0;
+                            bool[] n = new bool[8];
+                            int nu = 0;
+
                             if (MatN[i + 1, j] != 0)
-                                n++;
+                            { 
+                                n[4] = true;
+                                nu++;
+                            }
+                            else
+                                n[4] = false;
+
                             if (MatN[i, j + 1] != 0)
-                                n++;
+                            {
+                                n[6] = true;
+                                nu++;
+                            }
+                            else
+                                n[6] = false;
+
                             if (MatN[i - 1, j] != 0)
-                                n++;
+                            {
+                                n[0] = true;
+                                nu++;
+                            }
+                            else
+                                n[0] = false;
+
                             if (MatN[i, j - 1] != 0)
-                                n++;
+                            { 
+                                n[2] = true;
+                                nu++;
+                            }
+                            else
+                                n[2] = false;
+
                             if (MatN[i + 1, j + 1] != 0)
-                                n++;
+                            { 
+                                n[5] = true;
+                                nu++;
+                            }
+                            else
+                                n[5] = false;
+
                             if (MatN[i - 1, j + 1] != 0)
-                                n++;
+                            { 
+                                n[7] = true;
+                                nu++;
+                            }
+                            else
+                                n[7] = false;
+
                             if (MatN[i - 1, j - 1] != 0)
-                                n++;
+                            { 
+                                n[1] = true;
+                                nu++;
+                            }
+                            else
+                                n[1] = false;
+
                             if (MatN[i + 1, j - 1] != 0)
-                                n++;
-                            if (n == 4 || n == 3 || n == 2)
-                                MatN[i, j] = 4;
+                            { 
+                                n[3] = true;
+                                nu++;
+                            }
+                            else
+                                n[3] = false;
+                            if (nu == 2 || nu == 3 || nu == 4)
+                            {
+                                if (n[0] && n[1] && n[2] && n[3] || n[1] && n[2] && n[3] && n[4] ||
+                                      n[2] && n[3] && n[4] && n[5] || n[6] && n[3] && n[4] && n[5] ||
+                                      n[6] && n[7] && n[4] && n[5] || n[6] && n[7] && n[0] && n[5] ||
+                                      n[6] && n[7] && n[1] && n[0] || n[7] && n[0] && n[1] && n[2] ||
+                                      n[0] && n[1] && n[2] || n[3] && n[1] && n[2] || n[3] && n[4] && n[2] ||
+                                      n[3] && n[4] && n[5] || n[6] && n[4] && n[5] || n[6] && n[7] && n[5] ||
+                                      n[6] && n[7] && n[0] || n[7] && n[0] && n[1] ||
+                                      n[0] && n[1] || n[1] && n[2] || n[2] && n[3] || n[3] && n[4] ||
+                                      n[4] && n[5] || n[5] && n[6] || n[6] && n[6] || n[7] && n[0])
+                                    MatN[i, j] = 4;
+                            }
                         }
                     }
                 }
-                int[,] mask = new int[3, 3] { { 128, 1, 2 }, { 64, 0, 4 }, { 32, 16, 8 } };
+                int[,] mask = new int[3, 3] { { 128, 64, 32 }, { 1, 0, 16 }, { 2, 4, 8 } };
+                //int[,] mask = new int[3, 3] { { 128, 1, 2 }, { 64, 0, 4 }, { 32, 16, 8 } };
+                //int[,] mask = new int[3, 3] { { 8, 16, 32 }, { 4, 0, 64 }, { 2, 1, 128 } };
+
                 int[] tab_us = { 3, 5, 7, 12, 13, 14, 15, 20, 21, 22, 23, 28, 29, 30,
                 31, 48, 52, 53, 54, 55, 56, 60, 61, 62, 63, 65, 67, 69, 71, 77,
                 79, 80, 81, 83, 84, 85, 86, 87, 88, 89, 91, 92, 93, 94, 95, 97,
@@ -1502,27 +1570,48 @@ namespace AnalizaObrazu
                 208, 209, 211, 212, 213, 214, 215, 216, 217, 219, 220, 221, 222,
                 223, 224, 225, 227, 229, 231, 237, 239, 240, 241, 243, 244, 245,
                 246, 247, 248, 249, 251, 252, 253, 254, 255 };
+
                 for (int i = 1; i < (MatN.GetLength(0) - 1); i++)
                 {
                     for (int j = 1; j < (MatN.GetLength(1) - 1); j++)
                     {
                         if (MatN[i, j] == 4)
                         {
-                            int m = MatN[i + 1, j] * mask[2, 1] +
-                                MatN[i, j + 1] * mask[1, 2] +
-                                MatN[i - 1, j] * mask[0, 1] +
-                                MatN[i, j - 1] * mask[1, 0] +
-                                MatN[i + 1, j + 1] * mask[2, 2] +
-                                MatN[i - 1, j + 1] * mask[0, 2] +
-                                MatN[i - 1, j - 1] * mask[0, 0] +
-                                MatN[i + 1, j - 1] * mask[2, 0];
+                            int[,] m1 = new int[3, 3] { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
+                            if (MatN[i + 1, j] != 0)
+                                m1[2, 1] = 1;
+                            if (MatN[i, j + 1] != 0)
+                                m1[1, 2] = 1;
+                            if (MatN[i - 1, j] != 0)
+                                m1[0, 1] = 1;
+                            if (MatN[i, j - 1] != 0)
+                                m1[1, 0] = 1;
+                            if (MatN[i + 1, j + 1] != 0)
+                                m1[2, 2] = 1;
+                            if (MatN[i - 1, j + 1] != 0)
+                                m1[0, 2] = 1;
+                            if (MatN[i - 1, j - 1] != 0)
+                                m1[0, 0] = 1;
+                            if (MatN[i + 1, j - 1] != 0)
+                                m1[2, 0] = 1;
+                            int m = m1[2, 1] * mask[2, 1] +
+                                            m1[1, 2] * mask[1, 2] +
+                                            m1[0, 1] * mask[0, 1] +
+                                            m1[1, 0] * mask[1, 0] +
+                                            m1[2, 2] * mask[2, 2] +
+                                            m1[0, 2] * mask[0, 2] +
+                                            m1[0, 0] * mask[0, 0] +
+                                            m1[2, 0] * mask[2, 0];
+                            bool remove = false;
                             for (int k = 0; k < tab_us.GetLength(0); k++)
                             {
-                                if (m != tab_us[k])
-                                    MatN[i, j] = 0;
-                                else
-                                    MatN[i, j] = 1;
+                                if (m == tab_us[k])
+                                    remove = true;
                             }
+                            if (remove)
+                                MatN[i, j] = 0;
+                            else
+                                MatN[i, j] = 1;
                         }
                     }
                 }
@@ -1533,21 +1622,41 @@ namespace AnalizaObrazu
                     {
                         if (MatN[i, j] == 2)
                         {
-                            int m = MatN[i + 1, j] * mask[2, 1] +
-                                MatN[i, j + 1] * mask[1, 2] +
-                                MatN[i - 1, j] * mask[0, 1] +
-                                MatN[i, j - 1] * mask[1, 0] +
-                                MatN[i + 1, j + 1] * mask[2, 2] +
-                                MatN[i - 1, j + 1] * mask[0, 2] +
-                                MatN[i - 1, j - 1] * mask[0, 0] +
-                                MatN[i + 1, j - 1] * mask[2, 0];
+                            int[,] m1 = new int[3, 3] { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
+                            if (MatN[i + 1, j] != 0)
+                                m1[2, 1] = 1;
+                            if (MatN[i, j + 1] != 0)
+                                m1[1, 2] = 1;
+                            if (MatN[i - 1, j] != 0)
+                                m1[0, 1] = 1;
+                            if (MatN[i, j - 1] != 0)
+                                m1[1, 0] = 1;
+                            if (MatN[i + 1, j + 1] != 0)
+                                m1[2, 2] = 1;
+                            if (MatN[i - 1, j + 1] != 0)
+                                m1[0, 2] = 1;
+                            if (MatN[i - 1, j - 1] != 0)
+                                m1[0, 0] = 1;
+                            if (MatN[i + 1, j - 1] != 0)
+                                m1[2, 0] = 1;
+                            int m = m1[2, 1] * mask[2, 1] +
+                                            m1[1, 2] * mask[1, 2] +
+                                            m1[0, 1] * mask[0, 1] +
+                                            m1[1, 0] * mask[1, 0] +
+                                            m1[2, 2] * mask[2, 2] +
+                                            m1[0, 2] * mask[0, 2] +
+                                            m1[0, 0] * mask[0, 0] +
+                                            m1[2, 0] * mask[2, 0];
+                            bool remove = false;
                             for (int k = 0; k < tab_us.GetLength(0); k++)
                             {
-                                if (m != tab_us[k])
-                                    MatN[i, j] = 0;
-                                else
-                                    MatN[i, j] = 1;
+                                if (m == tab_us[k])
+                                    remove = true;
                             }
+                            if (remove)
+                                MatN[i, j] = 0;
+                            else
+                                MatN[i, j] = 1;
                         }
                     }
                 }
@@ -1556,23 +1665,43 @@ namespace AnalizaObrazu
                 {
                     for (int j = 1; j < (MatN.GetLength(1) - 1); j++)
                     {
-                        if (MatN[i, j] == 4)
+                        if (MatN[i, j] == 3)
                         {
-                            int m = MatN[i + 1, j] * mask[2, 1] +
-                                MatN[i, j + 1] * mask[1, 2] +
-                                MatN[i - 1, j] * mask[0, 1] +
-                                MatN[i, j - 1] * mask[1, 0] +
-                                MatN[i + 1, j + 1] * mask[2, 2] +
-                                MatN[i - 1, j + 1] * mask[0, 2] +
-                                MatN[i - 1, j - 1] * mask[0, 0] +
-                                MatN[i + 1, j - 1] * mask[2, 0];
+                            int[,] m1 = new int[3, 3] { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
+                            if (MatN[i + 1, j] != 0)
+                                m1[2, 1] = 1;
+                            if (MatN[i, j + 1] != 0)
+                                m1[1, 2] = 1;
+                            if (MatN[i - 1, j] != 0)
+                                m1[0, 1] = 1;
+                            if (MatN[i, j - 1] != 0)
+                                m1[1, 0] = 1;
+                            if (MatN[i + 1, j + 1] != 0)
+                                m1[2, 2] = 1;
+                            if (MatN[i - 1, j + 1] != 0)
+                                m1[0, 2] = 1;
+                            if (MatN[i - 1, j - 1] != 0)
+                                m1[0, 0] = 1;
+                            if (MatN[i + 1, j - 1] != 0)
+                                m1[2, 0] = 1;
+                            int m = m1[2, 1] * mask[2, 1] +
+                                            m1[1, 2] * mask[1, 2] +
+                                            m1[0, 1] * mask[0, 1] +
+                                            m1[1, 0] * mask[1, 0] +
+                                            m1[2, 2] * mask[2, 2] +
+                                            m1[0, 2] * mask[0, 2] +
+                                            m1[0, 0] * mask[0, 0] +
+                                            m1[2, 0] * mask[2, 0];
+                            bool remove = false;
                             for (int k = 0; k < tab_us.GetLength(0); k++)
                             {
-                                if (m != tab_us[k])
-                                    MatN[i, j] = 0;
-                                else
-                                    MatN[i, j] = 1;
+                                if (m == tab_us[k])
+                                    remove = true;
                             }
+                            if (remove)
+                                MatN[i, j] = 0;
+                            else
+                                MatN[i, j] = 1;
                         }
                     }
                 }
@@ -1596,6 +1725,25 @@ namespace AnalizaObrazu
                 }
             }
             return Mat;
+        }
+
+        bool eq(int[,] m1, int[,] m2)
+        {
+
+            for (int i = 0; i < (m1.GetLength(0)); i++)
+            {
+                for (int j = 0; j < (m2.GetLength(1)); j++)
+                {
+                    if (m1[i, j] == m2[i, j])
+                    {
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
     
