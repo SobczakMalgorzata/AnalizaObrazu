@@ -1518,7 +1518,7 @@ namespace AnalizaObrazu
                                 MatN[i + 1, j - 1] * mask[2, 0];
                             for (int k = 0; k < tab_us.GetLength(0); k++)
                             {
-                                if (m == tab_us[k])
+                                if (m != tab_us[k])
                                     MatN[i, j] = 0;
                                 else
                                     MatN[i, j] = 1;
@@ -1543,7 +1543,7 @@ namespace AnalizaObrazu
                                 MatN[i + 1, j - 1] * mask[2, 0];
                             for (int k = 0; k < tab_us.GetLength(0); k++)
                             {
-                                if (m == tab_us[k])
+                                if (m != tab_us[k])
                                     MatN[i, j] = 0;
                                 else
                                     MatN[i, j] = 1;
@@ -1568,7 +1568,7 @@ namespace AnalizaObrazu
                                 MatN[i + 1, j - 1] * mask[2, 0];
                             for (int k = 0; k < tab_us.GetLength(0); k++)
                             {
-                                if (m == tab_us[k])
+                                if (m != tab_us[k])
                                     MatN[i, j] = 0;
                                 else
                                     MatN[i, j] = 1;
