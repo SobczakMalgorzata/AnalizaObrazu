@@ -114,6 +114,7 @@
                     <MenuItem Name="SaveAsp3" Header="Save As" Click="SaveImageAs"/>
                     <MenuItem Name="IrisDetection" Header="Detekcja tęczówki" Click="IrisDetection_Click"/>
                     <MenuItem Name="KMM" Header="KMM" Click="KMM_Click"/>
+                    <MenuItem Name="K3M" Header="K3M" Click="K3M_Click"/>
                 </Menu>
             </TabItem>
         </TabControl>
