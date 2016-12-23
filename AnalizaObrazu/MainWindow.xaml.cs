@@ -1936,6 +1936,133 @@ namespace AnalizaObrazu
             Matrix = K3MAlgorithm(MatrixZero);
             ComeBack();
         }
+
+        private void FeatureExtraction_Click(object sender, RoutedEventArgs e)
+        {
+            Matrix = FeatureExtractionAlgorithm(MatrixZero);
+            ComeBack();
+        }
+
+        int[,,] FeatureExtractionAlgorithm(int[,,] Mat)
+        {
+            int[,] MatN = new int[Mat.GetLength(0), Mat.GetLength(1)];
+            int[,] MatP = new int[Mat.GetLength(0), Mat.GetLength(1)];
+
+            for (int i = 0; i < Mat.GetLength(0); i++)
+            {
+                for (int j = 0; j < Mat.GetLength(1); j++)
+                {
+                    if (Mat[i, j, 0] == 0 && Mat[i, j, 1] == 0 && Mat[i, j, 2] == 0)
+                    {
+                        MatN[i, j] = 1;
+                        MatP[i, j] = 0;
+                    }
+                    else
+                    {
+                        MatN[i, j] = 0;
+                        MatP[i, j] = 0;
+                    }
+                }
+            }
+
+            int[] tab_3 = { 42, 138, 162, 168, 81, 84, 21, 69 };
+
+            int[,] mask = new int[3, 3] { { 128, 64, 32 }, { 1, 0, 16 }, { 2, 4, 8 } };
+            //int[,] mask = new int[3, 3] { { 128, 1, 2 }, { 64, 0, 4 }, { 32, 16, 8 } };
+            //int[,] mask = new int[3, 3] { { 8, 16, 32 }, { 4, 0, 64 }, { 2, 1, 128 } };
+
+            for (int i = 1; i < (MatN.GetLength(0) - 1); i++)
+            {
+                for (int j = 1; j < (MatN.GetLength(1) - 1); j++)
+                {
+                    if (MatN[i, j] == 1)
+                    {
+                        int[,] m1 = new int[3, 3] { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
+                        if (MatN[i + 1, j] != 0)
+                            m1[2, 1] = 1;
+                        if (MatN[i, j + 1] != 0)
+                            m1[1, 2] = 1;
+                        if (MatN[i - 1, j] != 0)
+                            m1[0, 1] = 1;
+                        if (MatN[i, j - 1] != 0)
+                            m1[1, 0] = 1;
+                        if (MatN[i + 1, j + 1] != 0)
+                            m1[2, 2] = 1;
+                        if (MatN[i - 1, j + 1] != 0)
+                            m1[0, 2] = 1;
+                        if (MatN[i - 1, j - 1] != 0)
+                            m1[0, 0] = 1;
+                        if (MatN[i + 1, j - 1] != 0)
+                            m1[2, 0] = 1;
+                        int m = m1[2, 1] * mask[2, 1] +
+                            m1[1, 2] * mask[1, 2] +
+                            m1[0, 1] * mask[0, 1] +
+                            m1[1, 0] * mask[1, 0] +
+                            m1[2, 2] * mask[2, 2] +
+                            m1[0, 2] * mask[0, 2] +
+                            m1[0, 0] * mask[0, 0] +
+                            m1[2, 0] * mask[2, 0];
+                        bool remove = false;
+                        foreach (int k in tab_3)
+                        {
+                            if (m == k)
+                                remove = true;
+                        }
+                        if (remove)
+                        {
+                            MatN[i, j] = 3;
+                            MatN[i+2, j] = 3;
+                            MatN[i, j+2] = 3;
+                            MatN[i-2, j] = 3;
+                            MatN[i, j-2] = 3;
+                            MatN[i + 2, j+1] = 3;
+                            MatN[i+1, j + 2] = 3;
+                            MatN[i - 2, j+1] = 3;
+                            MatN[i+1, j - 2] = 3;
+                            MatN[i + 2, j+2] = 3;
+                            MatN[i+2, j + 2] = 3;
+                            MatN[i - 2, j+2] = 3;
+                            MatN[i+2, j - 2] = 3;
+                            MatN[i + 2, j - 1] = 3;
+                            MatN[i - 1, j + 2] = 3;
+                            MatN[i - 2, j - 1] = 3;
+                            MatN[i - 1, j - 2] = 3;
+                            MatN[i + 2, j - 2] = 3;
+                            MatN[i - 2, j + 2] = 3;
+                            MatN[i - 2, j - 2] = 3;
+                            MatN[i - 2, j - 2] = 3;
+                        }
+                        else
+                            MatN[i, j] = 1;
+                    }
+                }
+            }
+            for (int i = 0; i < Mat.GetLength(0); i++)
+            {
+                for (int j = 0; j < Mat.GetLength(1); j++)
+                {
+                    if (MatN[i, j] == 0)
+                    {
+                        Mat[i, j, 0] = 255;
+                        Mat[i, j, 1] = 255;
+                        Mat[i, j, 2] = 255;
+                    }
+                    else if(MatN[i, j] == 3)
+                    {
+                        Mat[i, j, 0] = 255;
+                        Mat[i, j, 1] = 0;
+                        Mat[i, j, 2] = 0;
+                    }
+                    else
+                    {
+                        Mat[i, j, 0] = 0;
+                        Mat[i, j, 1] = 0;
+                        Mat[i, j, 2] = 0;
+                    }
+                }
+            }
+            return Mat;
+        }
     }
     
 }
