@@ -1891,6 +1891,52 @@ namespace AnalizaObrazu
                     }
                 }
             }
+
+            for (int i = 1; i < (MatN.GetLength(0) - 1); i++)
+            {
+                for (int j = 1; j < (MatN.GetLength(1) - 1); j++)
+                {
+                    if (MatN[i, j] != 0)
+                    {
+                        int[,] m1 = new int[3, 3] { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
+                        if (MatN[i + 1, j] != 0)
+                            m1[2, 1] = 1;
+                        if (MatN[i, j + 1] != 0)
+                            m1[1, 2] = 1;
+                        if (MatN[i - 1, j] != 0)
+                            m1[0, 1] = 1;
+                        if (MatN[i, j - 1] != 0)
+                            m1[1, 0] = 1;
+                        if (MatN[i + 1, j + 1] != 0)
+                            m1[2, 2] = 1;
+                        if (MatN[i - 1, j + 1] != 0)
+                            m1[0, 2] = 1;
+                        if (MatN[i - 1, j - 1] != 0)
+                            m1[0, 0] = 1;
+                        if (MatN[i + 1, j - 1] != 0)
+                            m1[2, 0] = 1;
+                        int m = m1[2, 1] * mask[2, 1] +
+                            m1[1, 2] * mask[1, 2] +
+                            m1[0, 1] * mask[0, 1] +
+                            m1[1, 0] * mask[1, 0] +
+                            m1[2, 2] * mask[2, 2] +
+                            m1[0, 2] * mask[0, 2] +
+                            m1[0, 0] * mask[0, 0] +
+                            m1[2, 0] * mask[2, 0];
+                        bool remove = false;
+                        for (int k = 0; k < A1pix.GetLength(0); k++)
+                        {
+                            if (m == A1pix[k])
+                                remove = true;
+                        }
+                        if (remove)
+                            MatN[i, j] = 0;
+                        else
+                            MatN[i, j] = 1;
+                    }
+                }
+            }
+
             for (int i = 0; i < Mat.GetLength(0); i++)
             {
                 for (int j = 0; j < Mat.GetLength(1); j++)
